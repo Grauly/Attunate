@@ -2,7 +2,6 @@ package grauly.attunate.rendering.beams
 
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.minecraft.client.render.BufferBuilder
-import net.minecraft.client.render.OverlayTexture
 import net.minecraft.util.math.Vec3d
 import java.awt.Color
 import java.security.InvalidParameterException
@@ -17,22 +16,33 @@ class Beam(
 
     fun render(ctx: WorldRenderContext, buffer: BufferBuilder) {
         val camPos = ctx.camera().pos
-        val beamNormal = beamPoints[0].pos.subtract(camPos)
-        beamPoints.foldRight(beamPoints[0]) { current, last ->
-            val segmentDelta = last.pos.subtract(current.pos)
-            val localUp = beamNormal.crossProduct(segmentDelta).normalize()
-            beamSegment(last, current, localUp, ctx, buffer)
-            current
-        }
+        val beamNormal = beamPoints.first().pos.subtract(camPos)
+        beamPoints.subList(1, beamPoints.size)
+            .fold(beamPoints.first()) { accumulate: BeamPoint, current: BeamPoint ->
+                val segmentDelta = current.pos.subtract(accumulate.pos)
+                val localUp = beamNormal.crossProduct(segmentDelta).normalize()
+                beamSegment(current, accumulate, localUp, ctx, buffer)
+                current
+            }
     }
 
     private fun beamSegment(from: BeamPoint, to: BeamPoint, up: Vec3d, ctx: WorldRenderContext, buffer: BufferBuilder) {
-        fixBufferColor(buffer, from.color ?: beamColor)
-        beamVertex(from.pos.subtract(up.multiply(from.width)), buffer, ctx, 0f, 1f)
-        beamVertex(from.pos.add(up.multiply(from.width)), buffer, ctx, 0f, 0f)
-        fixBufferColor(buffer, from.color ?: beamColor)
+        //halving this bc of UV shenanigans
+        //upper half
+        fixBufferColor(buffer, to.color ?: beamColor)
+        beamVertex(to.pos, buffer, ctx, 1f, .5f)
         beamVertex(to.pos.add(up.multiply(to.width)), buffer, ctx, 1f, 0f)
+        fixBufferColor(buffer, from.color ?: beamColor)
+        beamVertex(from.pos.add(up.multiply(from.width)), buffer, ctx, 0f, 0f)
+        beamVertex(from.pos, buffer, ctx, 0f, .5f)
+
+        //lower half
+        fixBufferColor(buffer, to.color ?: beamColor)
         beamVertex(to.pos.subtract(up.multiply(to.width)), buffer, ctx, 1f, 1f)
+        beamVertex(to.pos, buffer, ctx, 1f, .5f)
+        fixBufferColor(buffer, from.color ?: beamColor)
+        beamVertex(from.pos, buffer, ctx, 0f, .5f)
+        beamVertex(from.pos.subtract(up.multiply(from.width)), buffer, ctx, 0f, 1f)
         buffer.unfixColor()
     }
 
@@ -55,9 +65,8 @@ class Beam(
             wPos.getZ().toFloat()
         )
             .texture(u, v)
-            .overlay(OverlayTexture.DEFAULT_UV)
             .next()
     }
 }
 
-data class BeamPoint(val pos: Vec3d, val width: Double, val color: Color? = null)
+data class BeamPoint(val pos: Vec3d, val width: Double = 0.1, val color: Color? = null)

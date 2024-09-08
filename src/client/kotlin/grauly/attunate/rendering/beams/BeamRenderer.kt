@@ -5,6 +5,7 @@ import grauly.attunate.Attunate
 import grauly.attunate.rendering.Shaders
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
+import net.minecraft.client.render.GameRenderer
 import net.minecraft.client.render.Tessellator
 import net.minecraft.client.render.VertexFormat
 import net.minecraft.client.render.VertexFormats
@@ -39,5 +40,6 @@ class BeamRenderer {
 
     fun addBeam(beam: Beam) {
         currentBeams.add(beam)
+        Attunate.LOGGER.info("added beam, now rendering {} beams", currentBeams.size)
     }
 }
