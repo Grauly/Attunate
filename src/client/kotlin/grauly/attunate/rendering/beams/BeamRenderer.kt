@@ -40,6 +40,5 @@ class BeamRenderer {
 
     fun addBeam(beam: Beam) {
         currentBeams.add(beam)
-        Attunate.LOGGER.info("added beam, now rendering {} beams", currentBeams.size)
     }
 }
