@@ -34,7 +34,7 @@ object RenderHelper {
         val positionMatrix = ctx.matrixStack().peek().positionMatrix
         val normalMatrix = ctx.matrixStack().peek().normalMatrix
 
-        //beamNormal = beamNormal.multiply(-1.0)
+        beamNormal = beamNormal.multiply(-1.0)
 
         //buffer.fixedColor(255, 0, 255, 100)
         beamVertAtVec(beamCenter, positionMatrix, normalMatrix, buffer, camPos, beamNormal, beamEtchPosition.toFloat(), 0.5f)
@@ -59,7 +59,8 @@ object RenderHelper {
             .next()
 
         RenderSystem.enableDepthTest()
-        RenderSystem.setShader(GameRenderer::getRenderTypeTranslucentProgram)
+        RenderSystem.enableBlend()
+        RenderSystem.setShader { Shaders.BEAM_SHADER }
         RenderSystem.setShaderTexture(0, Identifier.of(Attunate.MODID, "textures/misc/beam.png"))
     }
 
@@ -75,7 +76,7 @@ object RenderHelper {
     ): VertexConsumer {
         val wPos = pos.subtract(camPos)
         val vert = buffer.vertex(positionMatrix, wPos.getX().toFloat(), wPos.getY().toFloat(), wPos.getZ().toFloat())
-            .color(1f, 1f, 1f, 0f)
+            .color(1f, 0f, 1f, 1f)
             .texture(u,v)
             .overlay(OverlayTexture.DEFAULT_UV)
             .light(LightmapTextureManager.MAX_LIGHT_COORDINATE)
