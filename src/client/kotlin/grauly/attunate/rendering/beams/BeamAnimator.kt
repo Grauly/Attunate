@@ -1,5 +1,6 @@
 package grauly.attunate.rendering.beams
 
+import grauly.attunate.Attunate
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.minecraft.client.render.BufferBuilder
 
@@ -13,7 +14,7 @@ class BeamAnimator(
     fun render(ctx: WorldRenderContext, buffer: BufferBuilder) {
         beam.widthMultiplier = widthAnimation.invoke(currentLifeTime)
         beam.render(ctx, buffer)
-        currentLifeTime += ctx.tickDelta()
+        currentLifeTime += ctx.tickDelta() * 0.05
     }
 
     fun done(): Boolean = currentLifeTime > maxLifeTime
