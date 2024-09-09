@@ -5,14 +5,13 @@ import grauly.attunate.Attunate
 import grauly.attunate.rendering.Shaders
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents
-import net.minecraft.client.render.GameRenderer
 import net.minecraft.client.render.Tessellator
 import net.minecraft.client.render.VertexFormat
 import net.minecraft.client.render.VertexFormats
 import net.minecraft.util.Identifier
 
 class BeamRenderer {
-    val currentBeams = mutableSetOf<Beam>()
+    private val currentBeams = mutableSetOf<BeamAnimator>()
 
     init {
         WorldRenderEvents.AFTER_TRANSLUCENT.register(this::renderBeams)
@@ -33,12 +32,13 @@ class BeamRenderer {
         currentBeams.forEach { beam ->
             beam.render(ctx, buffer)
         }
+        currentBeams.removeIf { beam -> beam.done() }
 
         ctx.matrixStack().pop()
         Tessellator.getInstance().draw()
     }
 
-    fun addBeam(beam: Beam) {
+    fun addBeam(beam: BeamAnimator) {
         currentBeams.add(beam)
     }
 }

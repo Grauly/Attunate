@@ -6,9 +6,10 @@ import net.minecraft.util.math.Vec3d
 import java.awt.Color
 import java.security.InvalidParameterException
 
-class Beam(
+open class Beam(
     private val beamPoints: List<BeamPoint>,
     private val beamColor: Color,
+    var widthMultiplier: Double = 1.0
 ) {
     init {
         if (beamPoints.size < 2) throw InvalidParameterException("must specify at least 2 beam points")
@@ -26,23 +27,27 @@ class Beam(
             }
     }
 
+    open fun pointWidth(point: BeamPoint): Double {
+        return point.width * widthMultiplier
+    }
+
     private fun beamSegment(from: BeamPoint, to: BeamPoint, up: Vec3d, ctx: WorldRenderContext, buffer: BufferBuilder) {
         //halving this bc of UV shenanigans
         //upper half
         fixBufferColor(buffer, to.color ?: beamColor)
         beamVertex(to.pos, buffer, ctx, 1f, .5f)
-        beamVertex(to.pos.add(up.multiply(to.width)), buffer, ctx, 1f, 0f)
+        beamVertex(to.pos.add(up.multiply(pointWidth(to))), buffer, ctx, 1f, 0f)
         fixBufferColor(buffer, from.color ?: beamColor)
-        beamVertex(from.pos.add(up.multiply(from.width)), buffer, ctx, 0f, 0f)
+        beamVertex(from.pos.add(up.multiply(pointWidth(from))), buffer, ctx, 0f, 0f)
         beamVertex(from.pos, buffer, ctx, 0f, .5f)
 
         //lower half
         fixBufferColor(buffer, to.color ?: beamColor)
-        beamVertex(to.pos.subtract(up.multiply(to.width)), buffer, ctx, 1f, 1f)
+        beamVertex(to.pos.subtract(up.multiply(pointWidth(to))), buffer, ctx, 1f, 1f)
         beamVertex(to.pos, buffer, ctx, 1f, .5f)
         fixBufferColor(buffer, from.color ?: beamColor)
         beamVertex(from.pos, buffer, ctx, 0f, .5f)
-        beamVertex(from.pos.subtract(up.multiply(from.width)), buffer, ctx, 0f, 1f)
+        beamVertex(from.pos.subtract(up.multiply(pointWidth(from))), buffer, ctx, 0f, 1f)
         buffer.unfixColor()
     }
 
