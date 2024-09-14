@@ -16,12 +16,13 @@ object AttunateClient : ClientModInitializer {
             BeamAnimator(
                 Beam(
                     listOf(
-                        BeamPoint(Vec3d(0.0, 100.0, 0.0), 0.1),
-                        BeamPoint(Vec3d(8.0, 100.0, 0.0), 0.2, Color(0, 0, 255)),
-                        BeamPoint(Vec3d(10.0, 100.0, 0.0), 0.1)
+                        BeamPoint(Vec3d(0.0, 97.0, 0.0), 0.1),
+                        BeamPoint(Vec3d(8.0, 97.0, 0.0), 0.2, Color(0, 0, 255)),
+                        BeamPoint(Vec3d(10.0, 97.0, 0.0), 0.1)
                     ), Color(1f, 0f, 0f)
                 ),
-                { t -> sin(t) + 1 },
+                { t -> .5 * sin(t) + 1 },
+                { t -> Pair(1.0, .5 * sin(t) + 1) },
                 Double.POSITIVE_INFINITY
             )
         )
