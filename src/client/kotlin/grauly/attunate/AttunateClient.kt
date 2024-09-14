@@ -22,7 +22,7 @@ object AttunateClient : ClientModInitializer {
                     ), Color(1f, 0f, 0f)
                 ),
                 { t -> .5 * sin(t) + 1 },
-                { t -> Pair(.5, .5 * sin(t) + 1) },
+                { t -> Pair(.5 * sin(t/4) + 1, .5 * sin(t) + 1) },
                 Double.POSITIVE_INFINITY
             )
         )
