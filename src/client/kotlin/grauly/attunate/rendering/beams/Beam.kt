@@ -1,6 +1,5 @@
 package grauly.attunate.rendering.beams
 
-import grauly.attunate.Attunate
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.minecraft.client.render.BufferBuilder
 import net.minecraft.util.math.MathHelper
@@ -31,13 +30,13 @@ open class Beam(
     fun createSlice(anchor: Double, factor: Double): Beam {
         val beamLength = length()
         val anchorDistance = beamLength * anchor
-        val lateCutoff = anchorDistance * factor
-        val earlyCutoff = (beamLength - anchorDistance) * factor
+        val earlyCutoff = anchorDistance - (anchorDistance * factor)
+        val lateCutoff = anchorDistance + ((beamLength - anchorDistance) * factor)
         val earlySegment = createLerpSegment(earlyCutoff)
         val lateSegment = createLerpSegment(lateCutoff)
         val sliceBeamSegments = beamPoints
-            .dropLast(beamPoints.size - if(lateSegment != null) {lateSegment.first + 1} else {beamPoints.size} )
-            .drop(if(earlySegment != null) {earlySegment.first + 1} else 0)
+            .dropLast(beamPoints.size - (lateSegment?.first ?: beamPoints.size))
+            .drop(earlySegment?.first ?: 0)
             .toMutableList()
         if (earlySegment != null) sliceBeamSegments.add(0, earlySegment.second)
         if (lateSegment != null) sliceBeamSegments.add(lateSegment.second)
@@ -46,17 +45,17 @@ open class Beam(
 
     private fun createLerpSegment(beamPos: Double): Pair<Int, BeamPoint>? {
         var distance = 0.0
-        var index = 0
+        var dropIndices = 1
         beamPoints.reduce { previous: BeamPoint, current: BeamPoint ->
             val beamDelta = current.pos.subtract(previous.pos)
             val segmentLength = beamDelta.length()
             if (distance + segmentLength < beamPos) {
                 distance += segmentLength
-                index++
+                dropIndices++
                 return@reduce current
             }
             val segmentFac = (beamPos - distance) / segmentLength
-            return Pair(index, lerpSegment(previous, current, segmentFac))
+            return Pair(dropIndices, lerpSegment(previous, current, segmentFac))
         }
         return null
     }
