@@ -40,6 +40,5 @@ object ShotBeamPacket {
         return ShotBeamData(from, to, color)
     }
 
+    data class ShotBeamData(val from: Vec3d, val to: Vec3d, val color: Color)
 }
-
-data class ShotBeamData(val from: Vec3d, val to: Vec3d, val color: Color)
