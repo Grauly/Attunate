@@ -39,7 +39,7 @@ class BeamAnimator(
     companion object {
         val CONST_WIDTH = { _: Double -> 1.0 }
         val LINEAR_WIDTH_FADE = { t: Double -> -abs(2 * t - 1) + 1 }
-        val BASE = { t: Double ->
+        val SHOT_BASE_WIDTH = { t: Double ->
             if (t >= 0.0 && t < 0.1) {
                 MathHelper.lerp(10 * t, 0.0, 1.0)
             }
@@ -49,8 +49,15 @@ class BeamAnimator(
             if (t >= 0.5) {
                 MathHelper.lerp((t - .5) * 2, 1.0, 0.0)
             }
+            0.0
         }
 
-        val CONST_LENGTH = {_: Double -> Pair(1.0,1.0)}
+        val CONST_LENGTH = { _: Double -> Pair(1.0, 1.0) }
+        val SHOT_BASE_LENGTH = { t: Double ->
+            if (t >= 0.5) {
+                Pair(1.0, MathHelper.lerp((t - .5) * 2, 1.0, 0.0))
+            }
+            Pair(1.0, 1.0)
+        }
     }
 }
