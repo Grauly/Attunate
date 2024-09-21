@@ -66,31 +66,29 @@ open class Beam(
 
     private fun findSegmentLerp(beamPointFac: Double): Double {
         var length = 0.0
-        beamPoints.subList(1, beamPoints.size)
-            .fold(beamPoints.first()) { accumulate: BeamPoint, current: BeamPoint ->
-                val segmentDelta = current.pos.subtract(accumulate.pos)
-                val segmentLength = segmentDelta.length()
-                if (length + segmentLength > beamPointFac) {
-                    //now figure out the segment fac
-                    val segmentFac = beamPointFac - length
-                    return segmentFac / segmentLength
-                }
-                length += segmentLength
-                current
+        beamPoints.reduce { accumulate: BeamPoint, current: BeamPoint ->
+            val segmentDelta = current.pos.subtract(accumulate.pos)
+            val segmentLength = segmentDelta.length()
+            if (length + segmentLength > beamPointFac) {
+                //now figure out the segment fac
+                val segmentFac = beamPointFac - length
+                return segmentFac / segmentLength
             }
+            length += segmentLength
+            current
+        }
         return 0.0
     }
 
     private fun findBoundPoints(distance: Double): Pair<BeamPoint, BeamPoint> {
         var length = 0.0
-        beamPoints.subList(1, beamPoints.size)
-            .fold(beamPoints.first()) { accumulate: BeamPoint, current: BeamPoint ->
-                val segmentDelta = current.pos.subtract(accumulate.pos)
-                val segmentLength = segmentDelta.length()
-                if (length + segmentLength > distance) return Pair(accumulate, current)
-                length += segmentLength
-                current
-            }
+        beamPoints.reduce { accumulate: BeamPoint, current: BeamPoint ->
+            val segmentDelta = current.pos.subtract(accumulate.pos)
+            val segmentLength = segmentDelta.length()
+            if (length + segmentLength > distance) return Pair(accumulate, current)
+            length += segmentLength
+            current
+        }
         return Pair(beamPoints.last(), beamPoints.last())
     }
 
@@ -146,17 +144,16 @@ open class Beam(
 
     private fun lerpInt(fac: Double, a: Int, b: Int): Int {
         if (a == b) return a
-        if (b >= a) return lerpInt(1-fac, b, a)
+        if (b >= a) return lerpInt(1 - fac, b, a)
         return a - ((a - b) * fac).toInt()
     }
 
     private fun length(): Double {
         var length = 0.0
-        beamPoints.subList(1, beamPoints.size)
-            .fold(beamPoints.first()) { accumulate: BeamPoint, current: BeamPoint ->
-                length += accumulate.pos.distanceTo(current.pos)
-                current
-            }
+        beamPoints.reduce { accumulate: BeamPoint, current: BeamPoint ->
+            length += accumulate.pos.distanceTo(current.pos)
+            current
+        }
         return length
     }
 
