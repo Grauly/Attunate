@@ -1,5 +1,7 @@
 package grauly.attunate.rendering.beams
 
+import grauly.attunate.networking.SpawnBeamPacket
+import grauly.attunate.networking.SpawnBeamPacket.BeamPoint
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext
 import net.minecraft.client.render.BufferBuilder
 import net.minecraft.util.math.MathHelper
@@ -12,6 +14,8 @@ open class Beam(
     private val beamColor: Color,
     var widthMultiplier: Double = 1.0
 ) {
+    constructor(beamData: SpawnBeamPacket.BeamData) : this(beamData.beamPoints, beamData.color)
+
     init {
         if (beamPoints.size < 2) throw InvalidParameterException("must specify at least 2 beam points")
     }
@@ -203,5 +207,4 @@ open class Beam(
     }
 }
 
-data class BeamPoint(val pos: Vec3d, val width: Double = 0.1, val color: Color? = null)
 data class HSVColor(val h: Float, val s: Float, val v: Float)
