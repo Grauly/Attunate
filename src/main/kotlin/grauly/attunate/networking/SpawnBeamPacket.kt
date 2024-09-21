@@ -19,9 +19,7 @@ object SpawnBeamPacket {
         //write the beam points
         buf.writeCollection(beam.beamPoints) { buffer, beamPoint ->
             run {
-                buffer.writeDouble(beamPoint.pos.getX())
-                buffer.writeDouble(beamPoint.pos.getY())
-                buffer.writeDouble(beamPoint.pos.getZ())
+                NetworkingHelper.serializeVector(beamPoint.pos, buf)
                 buffer.writeDouble(beamPoint.width)
                 //null hack: if true, the following int is a color, if not, 0
                 buffer.writeBoolean(beamPoint.color != null)
@@ -40,7 +38,7 @@ object SpawnBeamPacket {
         val beamPoints = mutableListOf<BeamPoint>()
         //then read the elements
         for (i in 0..collectionSize) {
-            val pos = Vec3d(buf.readDouble(), buf.readDouble(), buf.readDouble())
+            val pos = NetworkingHelper.deserializeVector(buf)
             val width = buf.readDouble()
             //execute the null hack
             val color = if (buf.readBoolean()) Color(buf.readInt()) else {
